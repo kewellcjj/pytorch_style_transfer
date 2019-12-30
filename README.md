@@ -42,9 +42,8 @@ I used 19 style images, most of which are from other great style-transfer-relate
 Model used in the following examples can be found in the **pytorch_models** folder
 
 <div align='center'>
-  <img src='images/content_images/amber.jpg' height="200px">		
+  <img src='images/content_images/amber.jpg' height="200px">
 </div>
-16 out of the total 32 style images
 
 <div align='center'>
   <img src='output/amber_style0.jpg' height="200px">
