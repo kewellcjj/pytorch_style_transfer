@@ -44,7 +44,6 @@ Model used in the following examples can be found in the **pytorch_models** fold
 <div align='center'>
   <img src='images/content_images/amber.jpg' height="200px">		
 </div>
-16 out of the total 32 style images
 
 <div align='center'>
   <img src='images/output_images/amber_style0.jpg' height="200px">
