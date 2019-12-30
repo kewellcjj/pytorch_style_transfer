@@ -7,13 +7,13 @@ class TransformerNet(torch.nn.Module):
     def __init__(self, style_num):
         super(TransformerNet, self).__init__()
         self.conv1 = ConvLayer(3, 32, kernel_size = 9, stride = 1) 
-        self.in1 = batch_InstanceNorm2d(style_num, 32)
+        self.in1 = ConditionalInstanceNorm2d(32, style_num)
 
         self.conv2 = ConvLayer(32, 64, kernel_size = 3, stride = 2)
-        self.in2 = batch_InstanceNorm2d(style_num, 64)
+        self.in2 = ConditionalInstanceNorm2d(64, style_num)
 
         self.conv3 = ConvLayer(64, 128, kernel_size = 3, stride = 2)
-        self.in3 = batch_InstanceNorm2d(style_num, 128)
+        self.in3 = ConditionalInstanceNorm2d(128, style_num)
 
         self.res1 = ResidualBlock(128)
         self.res2 = ResidualBlock(128)
@@ -21,14 +21,14 @@ class TransformerNet(torch.nn.Module):
         self.res4 = ResidualBlock(128)
         self.res5 = ResidualBlock(128)
         self.deconv1 = UpsampleConvLayer(128, 64, kernel_size = 3, stride = 1, upsample = 2)
-        self.in4 = batch_InstanceNorm2d(style_num, 64)
+        self.in4 = ConditionalInstanceNorm2d(64, style_num)
         self.deconv2 = UpsampleConvLayer(64, 32, kernel_size = 3, stride = 1, upsample = 2)
-        self.in5 = batch_InstanceNorm2d(style_num, 32)
+        self.in5 = ConditionalInstanceNorm2d(32, style_num)
         self.deconv3 = ConvLayer(32, 3, kernel_size = 9, stride = 1)
         self.relu = torch.nn.ReLU()
 
-    def forward(self, X, style_id):
- 
+    def forward(self, model_in):
+        X,style_id=model_in
         y = self.relu(self.in1(self.conv1(X), style_id))
         y = self.relu(self.in2(self.conv2(y), style_id))
         y = self.relu(self.in3(self.conv3(y), style_id))
@@ -39,23 +39,25 @@ class TransformerNet(torch.nn.Module):
         y = self.res5(y)
         y = self.relu(self.in4(self.deconv1(y), style_id))
         y = self.relu(self.in5(self.deconv2(y), style_id))
-        y = self.deconv3(y) 
-        
+        y = self.deconv3(y)         
         return y
 
-class batch_InstanceNorm2d(torch.nn.Module):
-    """
-    Conditional Instance Normalization
-    introduced in https://arxiv.org/abs/1610.07629
-    created and applied based on my limited understanding, could be improved
-    """
-    def __init__(self, style_num, in_channels):
-        super(batch_InstanceNorm2d, self).__init__()
-        self.inns = torch.nn.ModuleList([torch.nn.InstanceNorm2d(in_channels, affine=True) for i in range(style_num)])
 
-    def forward(self, x, style_id):
-        out = torch.stack([self.inns[style_id[i]](x[i].unsqueeze(0)).squeeze_(0) for i in range(len(style_id))])
+class ConditionalInstanceNorm2d(torch.nn.Module):
+    def __init__(self, num_features, num_classes):
+        super(ConditionalInstanceNorm2d, self).__init__()
+        self.num_features = num_features
+        self.inst_norm = torch.nn.InstanceNorm2d(num_features, affine=False)
+        self.embed = torch.nn.Embedding(num_classes, num_features * 2)
+        self.embed.weight.data[:, :num_features].normal_(1, 0.02)  # Initialise scale at N(1, 0.02)
+        self.embed.weight.data[:, num_features:].zero_()  # Initialise bias at 0
+
+    def forward(self, x, style_index):
+        out = self.inst_norm(x)
+        gamma, beta = self.embed(style_index).chunk(2, 1)
+        out = gamma.view(-1, self.num_features, 1, 1) * out + beta.view(-1, self.num_features, 1, 1)
         return out
+
 
 class ConvLayer(torch.nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride):

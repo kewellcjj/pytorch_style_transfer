@@ -17,7 +17,7 @@ python neural_style.py train --dataset </path/to/train-dataset> --style-image </
 
 Stylize 
 ```
-python neural_style.py eval --content-image </path/to/content/image> --model </path/to/saved/model> --output-image </path/to/output/image> --cuda 0 --style-num 19 --style-id 18
+python neural_style.py eval --content-image </path/to/content/image> --model </path/to/saved/model> --output-image </path/to/output/image> --cuda 0 --style-num 32 --style-id 4
 ```
 * `--dataset`: path to training dataset, the path should point to a folder containing another folder with all the training images
 * `--style-num`: total number of style images, must be the same as the amount used in training
@@ -42,27 +42,26 @@ I used 19 style images, most of which are from other great style-transfer-relate
 Model used in the following examples can be found in the **pytorch_models** folder
 
 <div align='center'>
-  <img src='images/content_images/river.jpg' height="200px">		
+  <img src='images/content_images/amber.jpg' height="200px">		
 </div>
+16 out of the total 32 style images
 
 <div align='center'>
-  <img src='images/output_images/river_style0.jpg' height="200px">
-  <img src='images/output_images/river_style1.jpg' height="200px">
-  <img src='images/output_images/river_style2.jpg' height="200px">
-  <img src='images/output_images/river_style3.jpg' height="200px">
-  <img src='images/output_images/river_style4.jpg' height="200px">
-  <img src='images/output_images/river_style5.jpg' height="200px">
-  <img src='images/output_images/river_style6.jpg' height="200px">
-  <img src='images/output_images/river_style7.jpg' height="200px">
-  <img src='images/output_images/river_style8.jpg' height="200px">
-  <img src='images/output_images/river_style9.jpg' height="200px">
-  <img src='images/output_images/river_style10.jpg' height="200px">
-  <img src='images/output_images/river_style11.jpg' height="200px">
-  <img src='images/output_images/river_style12.jpg' height="200px">
-  <img src='images/output_images/river_style13.jpg' height="200px">
-  <img src='images/output_images/river_style14.jpg' height="200px">
-  <img src='images/output_images/river_style15.jpg' height="200px">
-  <img src='images/output_images/river_style16.jpg' height="200px">
-  <img src='images/output_images/river_style17.jpg' height="200px">
-  <img src='images/output_images/river_style18.jpg' height="200px">
+  <img src='output/amber_style0.jpg' height="200px">
+  <img src='output/amber_style1.jpg' height="200px">
+  <img src='output/amber_style2.jpg' height="200px">
+  <img src='output/amber_style3.jpg' height="200px">
+  <img src='output/amber_style4.jpg' height="200px">
+  <img src='output/amber_style5.jpg' height="200px">
+  <img src='output/amber_style6.jpg' height="200px">
+  <img src='output/amber_style7.jpg' height="200px">
+  <img src='output/amber_style8.jpg' height="200px">
+  <img src='output/amber_style9.jpg' height="200px">
+  <img src='output/amber_style10.jpg' height="200px">
+  <img src='output/amber_style11.jpg' height="200px">
+  <img src='output/amber_style12.jpg' height="200px">
+  <img src='output/amber_style13.jpg' height="200px">
+  <img src='output/amber_style14.jpg' height="200px">
+  <img src='output/amber_style15.jpg' height="200px">
+  <img src='output/amber_style16.jpg' height="200px">
 </div>

@@ -87,6 +87,7 @@ def train(args):
             optimizer.zero_grad() # initialize with zero gradients
 
             batch_style_id = [i % style_num for i in range(count-n_batch, count)]
+            batch_style_id = torch.LongTensor(batch_style_id).to(device)
             y = transformer(x.to(device), style_id = batch_style_id)
 
             y = utils.normalize_batch(y)
@@ -145,14 +146,21 @@ def stylize(args):
     ])
     content_image = content_transform(content_image)
     content_image = content_image.unsqueeze(0).to(device)
-
-
+    style_id = torch.LongTensor([args.style_id]).to(device)
+    
     with torch.no_grad():
+        import time
+        start = time.time()
         style_model = TransformerNet(style_num=args.style_num)
         state_dict = torch.load(args.model)
         style_model.load_state_dict(state_dict)
         style_model.to(device)
-        output = style_model(content_image, style_id = [args.style_id]).cpu()
+        output = style_model([content_image, style_id]).cpu()
+        end = time.time()
+        print('Time={}'.format(end - start))
+    if args.export_onnx:
+        assert args.export_onnx.endswith(".onnx"), "Export model file should end with .onnx"
+        output = torch.onnx._export(style_model, [content_image_t,style_t], args.export_onnx, input_names=['input_image','style_index'], output_names=['output_image']).cpu()
 
     utils.save_image('output/'+args.output_image+'_style'+str(args.style_id)+'.jpg', output[0])
 
@@ -210,6 +218,8 @@ def main():
                                   help="batch size for testing, default is 4")
     eval_arg_parser.add_argument("--style-num", type=int, default=4,
                                   help="number of styles used in training, default is 4")
+    eval_arg_parser.add_argument("--export_onnx", type=str,
+                                 help="export ONNX model to a given file")
 
     args = main_arg_parser.parse_args()
 
